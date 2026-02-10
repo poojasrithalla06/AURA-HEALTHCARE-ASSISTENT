@@ -1,1 +1,1 @@
-web: gunicorn --chdir aura_health app:app
+web: gunicorn app:app
