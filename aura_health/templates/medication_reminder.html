@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 600px; margin: 4rem auto; padding: 2rem;">
+    <h2 style="color: var(--secondary); text-align: center; margin-bottom: 2rem;">Add Medication Reminder</h2>
+
+    <form id="medicationForm" onsubmit="submitMedication(event)">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #555;">Medicine Name</label>
+            <input type="text" id="medName" class="form-control" required
+                style="width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid #ddd;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #555;">Time</label>
+            <input type="time" id="medTime" class="form-control" required
+                style="width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid #ddd;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #555;">Frequency</label>
+            <select id="medFreq" class="form-control"
+                style="width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid #ddd;">
+                <option value="Daily">Daily</option>
+                <option value="Twice Daily">Twice Daily</option>
+                <option value="Weekly">Weekly</option>
+            </select>
+        </div>
+
+        <button type="submit" class="cta-btn" style="width: 100%;">Set Reminder</button>
+    </form>
+</div>
+
+<script>
+    function submitMedication(e) {
+        e.preventDefault();
+        const medData = {
+            user_id: 1, // Mock User ID, in real app get from session
+            name: document.getElementById('medName').value,
+            time: document.getElementById('medTime').value,
+            frequency: document.getElementById('medFreq').value
+        };
+
+        fetch('/api/medication', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(medData)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Reminder Added!');
+                    window.location.href = "{{ url_for('main.dashboard') }}";
+                }
+            });
+    }
+</script>
+{% endblock %}

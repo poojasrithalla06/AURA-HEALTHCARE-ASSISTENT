@@ -1,0 +1,199 @@
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Voice Recognition Setup
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+
+    const micBtn = document.getElementById('micBtn');
+    if (micBtn) {
+        micBtn.addEventListener('click', () => {
+            const lang = document.getElementById('languageSelect').value;
+            recognition.lang = lang + '-IN';
+            recognition.start();
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('chatInput').value = transcript;
+            sendMessage();
+        };
+    }
+
+    // Chart.js Init (Dashboard)
+    const ctx = document.getElementById('healthTrendChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Heart Rate (bpm)',
+                    data: [72, 75, 70, 68, 74, 71, 73],
+                    borderColor: '#4A90E2',
+                    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'SpO2 (%)',
+                    data: [98, 97, 99, 98, 97, 98, 99],
+                    borderColor: '#50E3C2',
+                    backgroundColor: 'rgba(80, 227, 194, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                },
+                scales: {
+                    y: { beginAtZero: false } // Vitals don't start at 0 usually
+                }
+            }
+        });
+
+        // Mock Risk Calculation for UI
+        fetch('/api/predict_risk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ heart_rate: 72, risk_factors: [] })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const riskBar = document.getElementById('riskBar');
+                const riskText = document.getElementById('riskText');
+                if (riskBar) {
+                    riskBar.style.width = data.risk_score + '%';
+                    // Color based on risk
+                    if (data.risk_score > 60) riskBar.style.background = '#F44336';
+                    else if (data.risk_score > 30) riskBar.style.background = '#FF9800';
+                    else riskBar.style.background = '#4CAF50';
+
+                    riskText.innerText = data.risk_score + '% Risk (' + data.category + ')';
+                }
+            });
+    }
+
+    loadMedications();
+
+});
+
+function changeLanguage() {
+    const lang = document.getElementById('languageSelect').value;
+    console.log("Language switched to: " + lang);
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value;
+    if (!msg) return;
+
+    addMessage(msg, 'user-msg');
+    input.value = '';
+
+    // Simulate AI thinking logic
+    const chatWindow = document.getElementById('chatWindow');
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'chat-bubble bot-msg';
+    typingIndicator.id = 'typingIndicator';
+    typingIndicator.innerText = '...';
+    chatWindow.appendChild(typingIndicator);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    setTimeout(() => {
+        fetch('/api/chatbot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg, language: document.getElementById('languageSelect').value })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
+
+                addMessage(data.response, 'bot-msg');
+                speak(data.response);
+            });
+    }, 1000);
+}
+
+function addMessage(text, className) {
+    const chatWindow = document.getElementById('chatWindow');
+    const div = document.createElement('div');
+    div.className = 'chat-bubble ' + className;
+    div.innerText = text;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function speak(text) {
+    if (!window.speechSynthesis) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    const lang = document.getElementById('languageSelect').value;
+    utterance.lang = lang + '-IN';
+    window.speechSynthesis.speak(utterance);
+}
+
+function triggerSOS() {
+    if (confirm("Are you sure you want to trigger the EMERGENCY SOS?")) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                sendSOS(position.coords.latitude + ", " + position.coords.longitude);
+            }, () => {
+                sendSOS("Unknown Location (GPS Denied)");
+            });
+        } else {
+            sendSOS("Unknown Location (No GPS)");
+        }
+    }
+}
+
+function sendSOS(loc) {
+    fetch('/api/sos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: 1,
+            location: loc
+        })
+    })
+        .then(res => res.json())
+        .then(data => alert(data.message));
+}
+
+function loadMedications() {
+    if (typeof USER_ID === 'undefined') return;
+
+    fetch('/api/medication?user_id=' + USER_ID)
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('medList');
+            if (!list) return;
+            list.innerHTML = '';
+            if (data.length === 0) list.innerHTML = '<li style="color:#999; padding: 10px;">No reminders set.</li>';
+
+            data.forEach(med => {
+                // Create list item
+                const li = document.createElement('li');
+                li.style.cssText = "padding: 0.8rem; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;";
+                li.innerHTML = `
+                <div style="display:flex; align-items:center;">
+                    <i class="fas fa-capsules" style="color: var(--primary); margin-right: 10px;"></i>
+                    <div>
+                        <span style="display:block; font-weight: 500;">${med.name}</span>
+                        <small style="color:#999;">${med.frequency || 'Daily'}</small>
+                    </div>
+                </div>
+                <span style="font-weight: bold; color: var(--accent); background: #ffebee; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">${med.time}</span>
+            `;
+                list.appendChild(li);
+            });
+        });
+}
+
+function addMedication() {
+    window.location.href = "/medication";
+}

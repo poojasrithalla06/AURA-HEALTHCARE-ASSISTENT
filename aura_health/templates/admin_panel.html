@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 1000px; margin: 4rem auto; padding: 2rem;">
+    <h2 style="color: var(--primary); text-align: center; margin-bottom: 2rem;">Admin Panel</h2>
+
+    <div style="overflow-x: auto;">
+        <table class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--primary); color: white;">
+                    <th style="padding: 1rem; border-radius: 8px 0 0 8px;">ID</th>
+                    <th style="padding: 1rem;">Username</th>
+                    <th style="padding: 1rem;">Email</th>
+                    <th style="padding: 1rem;">Role</th>
+                    <th style="padding: 1rem; border-radius: 0 8px 8px 0;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 1rem;">{{ u.id }}</td>
+                    <td style="padding: 1rem; font-weight: bold;">{{ u.username }}</td>
+                    <td style="padding: 1rem;">{{ u.email }}</td>
+                    <td style="padding: 1rem;">
+                        <span class="badge"
+                            style="background: {{ 'var(--secondary)' if u.role == 'doctor' else '#FFC107' if u.role == 'admin' else '#ddd' }}; padding: 5px 10px; border-radius: 12px; color: #333; font-size: 0.8rem;">{{
+                            u.role }}</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <button class="cta-btn"
+                            style="background: #E91E63; padding: 5px 10px; font-size: 0.8rem;">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

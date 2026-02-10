@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 400px; margin: 4rem auto; padding: 2rem; text-align: center;">
+    <h2 style="color: #4A90E2; margin-bottom: 2rem;">Welcome Back</h2>
+
+    <form method="POST">
+        <div style="margin-bottom: 1.5rem;">
+            <input type="text" name="username" class="form-control" placeholder="Username" required
+                style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; outline: none;">
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <input type="password" name="password" class="form-control" placeholder="Password" required
+                style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; outline: none;">
+        </div>
+
+        <button type="submit" class="cta-btn" style="width: 100%;">Login</button>
+
+        <p style="margin-top: 1rem; color: #777;">Don't have an account? <a href="{{ url_for('auth.signup') }}"
+                style="color: #4A90E2;">Sign Up</a></p>
+    </form>
+</div>
+{% endblock %}

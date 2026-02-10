@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-section text-center">
+    <div class="hero-content">
+        <h1 style="font-size: 3.5rem; color: #2C3E50;">AI Powered Virtual <br> <span style="color: #4A90E2;">Healthcare
+                Assistant</span></h1>
+        <p style="font-size: 1.2rem; color: #555; max-width: 600px; margin: 0 auto 2rem;">
+            Experience the future of healthcare with AuraHealth. Get instant diagnosis, book appointments, and monitor
+            your health with our advanced AI.
+        </p>
+        <div style="margin-bottom: 2rem;">
+            <a href="{{ url_for('main.chatbot') }}" class="cta-btn"
+                style="background: #50E3C2; margin-right: 1rem;">Check Symptoms</a>
+            <a href="{{ url_for('main.create_appointment') }}" class="cta-btn">Book Appointment</a>
+        </div>
+
+        <img src="https://cdni.iconscout.com/illustration/premium/thumb/online-doctor-consultation-2675662-2234033.png"
+            alt="AI Doctor"
+            style="width: 100%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    </div>
+</div>
+
+<div class="features-section" style="padding: 4rem 0;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Key Features</h2>
+    <div class="feature-grid">
+        <div class="feature-card glass-card">
+            <i class="fas fa-robot fa-3x" style="color: #4A90E2; margin-bottom: 1rem;"></i>
+            <h3>AI Diagnosis</h3>
+            <p>Advanced symptom checking powered by NLP.</p>
+        </div>
+        <div class="feature-card glass-card">
+            <i class="fas fa-microphone-alt fa-3x" style="color: #E91E63; margin-bottom: 1rem;"></i>
+            <h3>Voice Assistant</h3>
+            <p>Multilingual voice support for accessibility.</p>
+        </div>
+        <div class="feature-card glass-card">
+            <i class="fas fa-heartbeat fa-3x" style="color: #50E3C2; margin-bottom: 1rem;"></i>
+            <h3>Health Monitoring</h3>
+            <p>Track vitals and get real-time insights.</p>
+        </div>
+        <div class="feature-card glass-card">
+            <i class="fas fa-file-medical-alt fa-3x" style="color: #FFC107; margin-bottom: 1rem;"></i>
+            <h3>Smart Reports</h3>
+            <p>Generate detailed health reports instantly.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

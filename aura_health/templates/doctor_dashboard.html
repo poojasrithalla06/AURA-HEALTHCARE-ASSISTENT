@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-card" style="margin: 4rem auto; padding: 2rem; max-width: 1000px;">
+    <h2 style="color: var(--primary); margin-bottom: 2rem;">Doctor Dashboard</h2>
+
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+
+        <div class="col glass-card" style="flex: 1; min-width: 300px; background: #fff;">
+            <h3>Upcoming Appointments</h3>
+            <div style="margin-top: 1rem;">
+                {% if appointments %}
+                {% for appt in appointments %}
+                <div
+                    style="border-bottom: 1px solid #eee; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0; color: #333;">{{ appt.user.username }}</h4>
+                        <p style="margin: 0; font-size: 0.9rem; color: #777;">{{ appt.date.strftime('%Y-%m-%d %H:%M') }}
+                        </p>
+                        <p style="margin: 0; font-style: italic; color: #555;">"{{ appt.reason }}"</p>
+                    </div>
+                    <div>
+                        <button class="cta-btn"
+                            style="background: #4CAF50; padding: 5px 10px; font-size: 0.8rem;">Approve</button>
+                        <button class="cta-btn"
+                            style="background: #F44336; padding: 5px 10px; font-size: 0.8rem;">Reschedule</button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="text-align: center; color: #999; padding: 2rem;">No appointments scheduled today.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col glass-card" style="flex: 1; min-width: 300px; background: #fff;">
+            <h3>Patient Alerts (SOS & High Risk)</h3>
+            <div style="margin-top: 1rem;">
+                <div class="alert-box"
+                    style="background: #ffebee; border-left: 5px solid #F44336; padding: 1rem; margin-bottom: 1rem;">
+                    <strong>EMERGENCY SOS</strong>
+                    <p>Patient John Doe triggered SOS at 10:45 AM.</p>
+                    <small>Location: 12.345, 67.890</small>
+                    <button class="cta-btn"
+                        style="background: #F44336; float: right; font-size: 0.7rem;">Dismiss</button>
+                </div>
+                <div class="alert-box" style="background: #fff3e0; border-left: 5px solid #FF9800; padding: 1rem;">
+                    <strong>High Risk Alert</strong>
+                    <p>Patient Jane Smith: Heart Rate > 120bpm</p>
+                    <button class="cta-btn"
+                        style="background: #FF9800; float: right; font-size: 0.7rem;">Review</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

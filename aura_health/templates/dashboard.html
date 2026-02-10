@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid" style="padding-top: 2rem;">
+    <h2 style="margin-bottom: 2rem; color: #444;">Hello, {{ user.username }}! <span
+            style="font-size: 1rem; color: #888;">Here's your health summary.</span></h2>
+
+    <div class="row" style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 3rem;">
+        <!-- Vitals Cards -->
+        <div class="col glass-card stat-card" style="flex: 1; min-width: 250px;">
+            <i class="fas fa-heartbeat fa-2x" style="margin-bottom: 1rem;"></i>
+            <h3>72 bpm</h3>
+            <p>Heart Rate</p>
+        </div>
+        <div class="col glass-card stat-card" style="background: linear-gradient(135deg, #FF6B6B, #EE5D5D);">
+            <i class="fas fa-thermometer-half fa-2x" style="margin-bottom: 1rem;"></i>
+            <h3>98.6 °F</h3>
+            <p>Body Temp</p>
+        </div>
+        <div class="col glass-card stat-card" style="background: linear-gradient(135deg, #4ECDC4, #556270);">
+            <i class="fas fa-lungs fa-2x" style="margin-bottom: 1rem;"></i>
+            <h3>98%</h3>
+            <p>SpO2 Level</p>
+        </div>
+        <div class="col glass-card stat-card" style="background: linear-gradient(135deg, #FFC107, #FF9800);">
+            <i class="fas fa-tachometer-alt fa-2x" style="margin-bottom: 1rem;"></i>
+            <h3>120/80</h3>
+            <p>Blood Pressure</p>
+        </div>
+    </div>
+
+    <div class="row" style="display: flex; gap: 2rem; flex-wrap: wrap;">
+        <!-- Left Column: Risk & Charts -->
+        <div class="col-8 glass-card" style="flex: 2; min-width: 300px;">
+            <h3 style="margin-bottom: 1.5rem;">Health Trends</h3>
+            <div class="chart-container">
+                <canvas id="healthTrendChart"></canvas>
+            </div>
+
+            <h3 style="margin-top: 2rem;">AI Risk Assessment</h3>
+            <div class="risk-meter">
+                <div class="risk-fill" id="riskBar"
+                    style="background: linear-gradient(90deg, #4CAF50, #FFEB3B, #F44336);"></div>
+            </div>
+            <p id="riskText" style="text-align: right; font-weight: bold; color: #555;">Calculating...</p>
+        </div>
+
+        <!-- Right Column: Appointments & Reminders -->
+        <div class="col-4" style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 2rem;">
+
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1rem;">Next Appointment</h3>
+                {% if appointments %}
+                {% for appt in appointments[:2] %}
+                <div style="border-left: 4px solid var(--primary); padding-left: 1rem; margin-bottom: 1rem;">
+                    <p style="font-weight: bold; color: #333; margin: 0;">{{ appt.date.strftime('%b %d, %Y - %H:%M') }}
+                    </p>
+                    <p style="font-size: 0.9rem; color: #666; margin: 0;">{{ appt.reason }}</p>
+                    <span class="badge"
+                        style="background: #eef2f5; color: #444; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">{{
+                        appt.status }}</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color: #999;">No upcoming appointments.</p>
+                {% endif %}
+                <a href="{{ url_for('main.create_appointment') }}" class="cta-btn"
+                    style="font-size: 0.8rem; padding: 5px 15px; display: inline-block; margin-top: 10px;">Book Now</a>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1rem;">Medications</h3>
+                <ul id="medList" style="list-style: none; padding: 0;">
+                    <!-- Populated by JS -->
+                    <li style="color: #999;">Loading...</li>
+                </ul>
+                <button onclick="addMedication()" class="cta-btn"
+                    style="background: var(--secondary); font-size: 0.8rem; padding: 5px 15px;">+ Add Reminder</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pass user ID to JS
+    const USER_ID = {{ user.id }};
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 4rem auto; padding: 2rem; position: relative;" id="reportArea">
+    <div style="text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem;">
+        <h1 style="color: var(--primary); margin: 0;">AuraHealth Medical Report</h1>
+        <p style="color: #666; font-size: 0.9rem;">Report ID: #RPT-{{ user.id }}-{{ as_at|default('NOW') }}</p>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+        <div>
+            <h3 style="margin-bottom: 0.5rem; color: #444;">Patient Details</h3>
+            <p style="margin: 0; color: #555;"><strong>Name:</strong> {{ user.username }}</p>
+            <p style="margin: 0; color: #555;"><strong>Email:</strong> {{ user.email }}</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="margin: 0; color: #555;"><strong>Date:</strong> <span id="currentDate"></span></p>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #444; border-bottom: 2px solid var(--secondary); display: inline-block;">
+            Latest Vitals</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f9f9f9; text-align: left;">
+                    <th style="padding: 10px;">Metric</th>
+                    <th style="padding: 10px;">Readings</th>
+                    <th style="padding: 10px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if trends %}
+                {% for t in trends[-1:] %}
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">Heart Rate</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ t.heart_rate }} bpm</td>
+                    <td
+                        style="padding: 10px; border-bottom: 1px solid #eee; color: {{ 'red' if t.heart_rate > 100 else 'green' }};">
+                        {{ 'High' if t.heart_rate > 100 else 'Normal' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">Risk Score</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ t.risk_score }} / 100</td>
+                    <td
+                        style="padding: 10px; border-bottom: 1px solid #eee; color: {{ 'red' if t.risk_score > 50 else 'green' }};">
+                        {{ 'Elevated' if t.risk_score > 50 else 'Low' }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="3" style="padding: 1rem; text-align: center;">No health data recorded yet.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #444; border-bottom: 2px solid var(--secondary); display: inline-block;">
+            AI Recommendations</h3>
+        <ul style="list-style-type: cicle; color: #555; line-height: 1.6;">
+            <li>Daily 30-minute cardio exercise recommended.</li>
+            <li>Maintain hydration (3L Water/day).</li>
+            <li>Follow up with Dr. Strange if headaches persist.</li>
+        </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: 4rem;">
+        <button onclick="window.print()" class="cta-btn" style="background: var(--primary);"><i
+                class="fas fa-file-pdf"></i> Download PDF Report</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString();
+</script>
+{% endblock %}
