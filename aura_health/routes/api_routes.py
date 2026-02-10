@@ -3,7 +3,7 @@ from models.database import db, Medication, Feedback, SOSAlert, HealthTrend, Use
 from utils.ai_engine import predict_risk, chat_response
 from datetime import datetime
 import json
-import pdfkit # In practice, user needs wkhtmltopdf installed or another library. We'll use a simple HTML print method via JS, but API is here.
+
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
