@@ -15,9 +15,16 @@
             <a href="{{ url_for('main.create_appointment') }}" class="cta-btn">Book Appointment</a>
         </div>
 
-        <img src="https://cdni.iconscout.com/illustration/premium/thumb/online-doctor-consultation-2675662-2234033.png"
-            alt="AI Doctor"
-            style="width: 100%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+        <div class="doctor-box-container" style="margin-top: 3rem; display: flex; justify-content: center;">
+            <div class="doctor-box">
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/online-doctor-consultation-2675662-2234033.png"
+                    alt="AI Doctor" style="width: 100%;"
+                    onerror="this.src='https://img.freepik.com/free-vector/doctor-character-background_1270-84.jpg'">
+                <div style="margin-top: 15px; font-weight: 700; color: #2C3E50; font-size: 1.2rem;">
+                    <i class="fas fa-user-md" style="color: #50E3C2; margin-right: 10px;"></i>AI Doctor
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

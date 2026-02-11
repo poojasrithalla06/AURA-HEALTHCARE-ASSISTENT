@@ -45,28 +45,66 @@ def chat_response(message, language, user_id):
     # Mock NLP Chatbot
     msg = message.lower()
     
+    # Keyword mapping for different languages to internal intent
+    intents = {
+        'hello': ['hello', 'hi', 'hey', 'namaste', 'హలో', 'నమస్తే', 'नमस्ते', 'नमस्कार'],
+        'headache': ['headache', 'head pain', 'తలనొప్పి', 'सिरदर्द', 'डोकेदुखी', 'തലവേദന', 'தலைவலி'],
+        'fever': ['fever', 'జ్వరం', 'ఫీవర్', 'बुखार', 'ताप', 'പനി', 'காய்ச்சல்', 'favour'], # added 'favour' as a common typo
+        'appointment': ['appointment', 'book', 'doctor', 'అపాయింట్మెంట్', 'డాక్టర్', 'अपॉइंटमेंट', 'डॉक्टर', 'അപ്പോയിന്റ്മെന്റ്', 'அப்பாயிண்ட்மெண்ட்'],
+        'thanks': ['thanks', 'thank you', 'ధన్యవాదాలు', 'ధన్యవాదాలు', 'धन्यवाद', 'आभारी आहे', 'നന്ദി', 'நன்றி']
+    }
+
     responses = {
         'en': {
-            'hello': "Hello! I am Aura, your health assistant. How can I help you today?",
-            'headache': "For a headache, try resting in a dark room and staying hydrated. If it persists, consult a doctor.",
-            'fever': "Monitor your temperature. If it exceeds 102°F (39°C), seek medical attention immediately.",
-            'appointment': "You can book an appointment from your dashboard. Would you like me to redirect you?",
-            'default': "I'm not sure specifically, but I can help you track symptoms or book a doctor."
+            'hello': "Hello! I am Aura, your virtual healthcare assistant. I can help you check symptoms, monitor vitals, or book appointments. How are you feeling today?",
+            'headache': "I'm sorry to hear about your headache. For mild cases, rest in a quiet, dark room and stay hydrated. However, if it's severe or accompanied by nausea or vision changes, please consult a doctor immediately.",
+            'fever': "A fever usually indicates your body is fighting an infection. Rest well, drink plenty of fluids, and monitor your temperature carefully. If it stays above 102°F (39°C) or lasts more than 3 days, seek medical attention.",
+            'appointment': "I can help you with that! You can navigate to the 'Book Appointment' section on your dashboard to see available specialists. Would you like me to guide you there?",
+            'thanks': "You're very welcome! I'm here to help. Stay healthy!",
+            'default': "I understand you're reachng out about your health. Could you please provide more details about your symptoms so I can assist you better? You can also book a consultation with our experts."
         },
         'hi': { # Hindi
-            'hello': "Namaste! Main Aura hun, aapki swasthya sahayak.",
-            'default': "Maaf kijiye, main abhi seekh rahi hun."
+            'hello': "नमस्ते! मैं ऑरा हूँ, आपकी स्वास्थ्य सहायक। मैं लक्षणों की जांच करने, स्वास्थ्य पर नज़र रखने या अपॉइंटमेंट बुक करने में आपकी मदद कर सकती हूँ। आज आप कैसा महसूस कर रहे हैं?",
+            'headache': "सिरदर्द के बारे में जानकर दुख हुआ। हल्के सिरदर्द के लिए, आराम करें और पानी पिएं। यदि दर्द तेज है, तो कृपया डॉक्टर से मिलें।",
+            'fever': "बुखार आमतौर पर संक्रमण का संकेत है। आराम करें और तरल पदार्थ पिएं। यदि बुखार 102°F से अधिक है, तो तुरंत डॉक्टर से संपर्क करें।",
+            'appointment': "मैं आपकी मदद कर सकती हूँ! आप डैशबोर्ड पर जाकर अपॉइंटमेंट बुक कर सकते हैं।",
+            'thanks': "आपका स्वागत है! अपना ख्याल रखें।",
+            'default': "मैं समझ रही हूँ। क्या आप मुझे अपने लक्षणों के बारे में थोड़ा और बता सकते हैं?"
+        },
+        'te': { # Telugu
+            'hello': "నమస్తే! నేను ఆరా, మీ వర్చువల్ హెల్త్‌కేర్ అసిస్టెంట్‌ని. నేను మీకు లక్షణాలను తనిఖీ చేయడంలో లేదా అపాయింట్‌మెంట్‌లను బుక్ చేయడంలో సహాయపడగలను. ఈ రోజు మీరు ఎలా ఉన్నారు?",
+            'headache': "మీ తలనొప్పి గురించి వినడానికి బాధగా ఉంది. విశ్రాంతి తీసుకోండి మరియు నీరు ఎక్కువగా త్రాగండి. నొప్పి ఎక్కువగా ఉంటే వెంటనే డాక్టరును సంప్రదించండి.",
+            'fever': "జ్వరం సాధారణంగా ఇన్ఫెక్షన్‌ని సూచిస్తుంది. బాగా విశ్రాంతి తీసుకోండి, తగినంత ద్రవాలు త్రాగండి. ఒకవేళ జ్వరం 102°F కంటే ఎక్కువగా ఉన్నా లేదా 3 రోజులకు పైగా ఉన్నా, డాక్టరును సంప్రదించండి.",
+            'appointment': "నేను మీకు సహాయం చేయగలను! అపాయింట్‌మెంట్ బుక్ చేసుకోవడానికి మీరు మీ డాష్‌బోర్డ్ లోని 'Book Appointment' విభాగంలో చూడవచ్చు.",
+            'thanks': "మీకు స్వాగతం! ఆరోగ్యంగా ఉండండి.",
+            'default': "క్షమించండి, మీ సమస్య నాకు సరిగ్గా అర్థం కాలేదు. దయచేసి మీ లక్షణాల గురించి వివరించండి, నేను మీకు సహాయం చేస్తాను."
+        },
+        'mr': { # Marathi
+            'hello': "नमस्कार! मी ऑरा आहे, तुमची आरोग्य सहाय्यक. मी तुम्हाला आज कशी मदत करू शकते?",
+            'fever': "ताप येणे हे सहसा संसर्गाचे लक्षण असते. विश्रांती घ्या आणि पाणी भरपूर प्या. ताप वाढल्यास डॉक्टरांचा सल्ला घ्या.",
+            'default': "मला तुमचे म्हणणे नीट समजले नाही. कृपया सविस्तर सांगा."
+        },
+        'ta': { # Tamil
+            'hello': "வணக்கம்! நான் ஆரா, உங்கள் சுகாதார உதவியாளர். உங்களுக்கு இன்று நான் எப்படி உதவ முடியும்?",
+            'fever': "காய்ச்சல் பொதுவாக ஒரு தொற்றுநோயைக் குறிக்கிறது. ஓய்வெடுங்கள், போதுமான அளவு தண்ணீர் குடிக்கவும். காய்ச்சல் நீடித்தால் மருத்துவரை அணுகவும்.",
+            'default': "மன்னிக்கவும், நீங்கள் சொல்வது எனக்கு புரியவில்லை. தயவுசெய்து விரிவாக சொல்லுங்கள்."
+        },
+        'ml': { # Malayalam
+            'hello': "നമസ്കാരം! ഞാൻ ഓറ, നിങ്ങളുടെ ആരോഗ്യ സഹായി. ഇന്ന് ഞാൻ നിങ്ങൾക്ക് എങ്ങനെ സഹായിക്കാം?",
+            'fever': "പനി സാധാരണയായി ഒരു അണുബാധയെ സൂചിപ്പിക്കുന്നു. വിശ്രമിക്കുക, ധാരാളം വെള്ളം കുടിക്കുക. പനി കൂടിയാൽ ഡോക്ടറെ കാണുക.",
+            'default': "ക്ഷമിക്കണം, എനിക്ക് മനസ്സിലായില്ല. ദയവായി കൂടുതൽ വിവരങ്ങൾ നൽകുക."
         }
-        # Add other languages as needed
     }
     
-    lang_responses = responses.get(language, responses['en'])
+    # Determine the intent based on keywords
+    intent_found = 'default'
+    for intent, keywords in intents.items():
+        if any(keyword in msg for keyword in keywords):
+            intent_found = intent
+            break
+            
+    # Get current language dictionary, fallback to English
+    lang_dict = responses.get(language, responses['en'])
     
-    if 'hello' in msg or 'hi' in msg:
-        return lang_responses.get('hello')
-    elif 'headache' in msg or 'pain' in msg:
-        return lang_responses.get('headache', responses['en']['headache'])
-    elif 'fever' in msg:
-        return lang_responses.get('fever', responses['en']['fever'])
-    else:
-        return lang_responses.get('default')
+    # Return matched intent in the correct language
+    return lang_dict.get(intent_found, lang_dict['default'])
